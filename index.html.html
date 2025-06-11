@@ -1,0 +1,1999 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>恋爱冲突应对表现问卷调查</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <!-- 配置Tailwind CSS -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4F46E5',
+            secondary: '#EC4899',
+            neutral: '#1F2937',
+            light: '#F3F4F6',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .question-card {
+        @apply bg-white rounded-xl shadow-md p-6 mb-6 transition-all duration-300 hover:shadow-lg;
+      }
+      .btn-primary {
+        @apply bg-primary text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:bg-primary/90 focus:ring-4 focus:ring-primary/30;
+      }
+      .btn-secondary {
+        @apply bg-secondary text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30;
+      }
+      .progress-bar {
+        @apply h-4 bg-gray-200 rounded-full overflow-hidden;
+      }
+      .progress-fill {
+        @apply h-full rounded-full transition-all duration-700;
+      }
+      .section-title {
+        @apply text-2xl md:text-3xl font-bold text-neutral mb-6 relative pb-2;
+      }
+      .section-title::after {
+        content: '';
+        @apply absolute bottom-0 left-0 w-20 h-1 bg-primary;
+      }
+      .result-card {
+        @apply bg-white rounded-xl shadow-md p-6 mb-6 border-l-4 border-primary/50 transition-all duration-300 hover:shadow-lg;
+      }
+      .percentile-badge {
+        @apply inline-block px-3 py-1 rounded-full text-xs font-medium mt-2;
+      }
+      .p10 { background-color: #ef4444; color: white; }
+      .p20 { background-color: #f59e0b; color: white; }
+      .p30 { background-color: #eab308; color: white; }
+      .p40 { background-color: #84cc16; color: white; }
+      .p50 { background-color: #10b981; color: white; }
+      .p60 { background-color: #06b6d4; color: white; }
+      .p70 { background-color: #0ea5e9; color: white; }
+      .p80 { background-color: #3b82f6; color: white; }
+      .p90 { background-color: #8b5cf6; color: white; }
+    }
+  </style>
+</head>
+<body class="bg-light font-sans text-neutral min-h-screen flex flex-col">
+  <!-- 头部导航 -->
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <i class="fa fa-heart text-primary text-2xl"></i>
+        <h1 class="text-xl md:text-2xl font-bold text-primary">恋爱冲突应对表现调查</h1>
+      </div>
+      <div class="flex items-center space-x-4">
+        <button id="progress-btn" class="hidden md:flex items-center text-sm text-primary font-medium">
+          <i class="fa fa-bar-chart mr-1"></i> 查看进度
+        </button>
+        <button id="submit-btn" class="btn-primary hidden">
+          <i class="fa fa-check mr-1"></i> 提交问卷
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="flex-grow container mx-auto px-4 py-8">
+    <!-- 欢迎页面 -->
+    <section id="welcome-section" class="max-w-3xl mx-auto text-center">
+      <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+        <h2 class="text-3xl font-bold text-neutral mb-4">同学，你好！</h2>
+        <p class="text-lg text-gray-600 mb-6">感谢参加本次问卷调查。我们正在开展一项关于大学生对恋爱中的冲突应对表现的学术研究，希望通过您的真实填写了解你在恋爱冲突中的真实表现。</p>
+        <p class="text-gray-600 mb-8">问卷内容将完全匿名，仅用于学术分析。请根据自身实际情况作答。</p>
+        <button id="start-btn" class="btn-primary text-lg">
+          <i class="fa fa-arrow-right mr-2"></i> 开始填写问卷
+        </button>
+      </div>
+    </section>
+
+    <!-- 问卷内容区 -->
+    <section id="questionnaire-section" class="hidden">
+      <!-- 进度条 -->
+      <div class="mb-8">
+        <div class="flex justify-between mb-2">
+          <span class="text-sm font-medium text-gray-500">开始</span>
+          <span class="text-sm font-medium text-gray-500">个人信息</span>
+          <span class="text-sm font-medium text-gray-500">冲突应对</span>
+          <span class="text-sm font-medium text-gray-500">心理反应</span>
+          <span class="text-sm font-medium text-gray-500">完成</span>
+        </div>
+        <div class="progress-bar" id="progress-bar">
+          <div class="progress-fill bg-primary" id="progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- 个人信息部分 -->
+      <section id="personal-info" class="mb-12">
+        <h2 class="section-title">个人信息</h2>
+        
+        <div class="question-card">
+          <p class="text-lg font-medium mb-4">您的性别：</p>
+          <div class="grid grid-cols-2 gap-4">
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="gender" value="1" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>男</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="gender" value="2" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>女</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card">
+          <p class="text-lg font-medium mb-4">您的年龄段：</p>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="age" value="1" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>18岁以下</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="age" value="2" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>18~25</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="age" value="3" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>26~30</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="age" value="4" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>31~40</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="age" value="5" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>41~50</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="age" value="6" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>51~60</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="age" value="7" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>61岁以上</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card">
+          <p class="text-lg font-medium mb-4">您的恋爱经历：</p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="love-experience" value="0" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>无</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="love-experience" value="1" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>1-3段</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="love-experience" value="2" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>3段以上</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card">
+          <p class="text-lg font-medium mb-4">您现在的恋爱状况：</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="relationship-status" value="0" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>单身</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="relationship-status" value="1" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>恋爱中</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" id="relationship-duration">
+          <p class="text-lg font-medium mb-4">您目前的恋爱持续时长（单身填无）：</p>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="relationship-duration" value="0" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>1年以内</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="relationship-duration" value="1" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>1-2年</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="relationship-duration" value="2" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>2年以上</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="relationship-duration" value="3" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>无</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card">
+          <p class="text-lg font-medium mb-4">您的阶段：</p>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="stage" value="1" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>大一</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="stage" value="2" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>大二</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="stage" value="3" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>大三</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="stage" value="4" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>大四</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="stage" value="5" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>研一</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="stage" value="6" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>研二</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="stage" value="7" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+              <span>研三</span>
+            </label>
+            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="stage" value="8" class="mr-3 h-5 w-5 text-primary focus:ring-primary">
+               <span>工作</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="flex justify-end mt-8">
+          <button id="next-personal" class="btn-primary">
+            <i class="fa fa-arrow-right mr-2"></i> 下一步
+          </button>
+        </div>
+      </section>
+
+      <!-- 冲突应对部分 -->
+      <section id="conflict-coping" class="mb-12 hidden">
+        <h2 class="section-title">恋爱冲突应对表现</h2>
+        <p class="text-gray-600 mb-6">接下来的题目请您依据自身的实际情况选择合适的选项。若您没有过恋爱经历，请您想象您拥有一位恋爱时长1年半的伴侣，并依据自身实际情况作答。</p>
+        
+        <!-- 第1-10题 -->
+        <div class="question-card" data-dimension="cooperation">
+          <p class="text-lg font-medium mb-4">1. 我尽力与对方共同探讨问题以便找到双方均可接受的解决办法</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q1" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q1" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q1" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q1" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q1" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="accommodation">
+          <p class="text-lg font-medium mb-4">2. 我一般尽量满足对方的需要</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q2" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q2" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q2" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q2" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q2" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="avoidance">
+          <p class="text-lg font-medium mb-4">3. 我努力避免自己被置于难堪的境地并尽力压制与对方之间的冲突</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q3" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q3" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q3" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q3" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q3" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="cooperation">
+          <p class="text-lg font-medium mb-4">4. 我尽力整合自己与对方的观点以便共同制定决策</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q4" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q4" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q4" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q4" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q4" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="cooperation">
+          <p class="text-lg font-medium mb-4">5. 我尝试与对方共同努力以获取能够满足双方期望的问题解决方案</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q5" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q5" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q5" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q5" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q5" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="avoidance">
+          <p class="text-lg font-medium mb-4">6. 我通常会避免与对方公开讨论双方的分歧</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q6" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q6" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q6" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q6" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q6" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="compromise">
+          <p class="text-lg font-medium mb-4">7. 我尽力找到一种折中办法以打破与对方之间的僵局</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q7" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q7" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q7" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q7" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q7" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="domination">
+          <p class="text-lg font-medium mb-4">8. 我利用我的影响力以使我的意见被接受</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q8" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q8" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q8" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q8" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q8" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="domination">
+          <p class="text-lg font-medium mb-4">9. 我利用我的职权制定对自己有利的决策</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q9" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q9" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q9" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q9" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q9" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="accommodation">
+          <p class="text-lg font-medium mb-4">10. 我通常会顺应对方的一些意愿</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q10" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q10" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q10" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q10" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q10" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <!-- 第11-20题 -->
+        <div class="question-card" data-dimension="accommodation">
+          <p class="text-lg font-medium mb-4">11. 我会对对方的愿望做出让步</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q11" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q11" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q11" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q11" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q11" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="cooperation">
+          <p class="text-lg font-medium mb-4">12. 我会与对方交流准确信息以共同解决问题</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q12" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q12" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q12" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q12" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q12" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="accommodation">
+          <p class="text-lg font-medium mb-4">13. 我通常会向对方做出让步</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q13" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q13" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q13" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q13" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q13" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="compromise">
+          <p class="text-lg font-medium mb-4">14. 我通常会提供一个中间方案以打破僵局</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q14" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q14" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q14" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q14" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q14" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="compromise">
+          <p class="text-lg font-medium mb-4">15. 我与对方进行谈判以便双方能达成妥协</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q15" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q15" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q15" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q15" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q15" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="avoidance">
+          <p class="text-lg font-medium mb-4">16. 我尽量远离与对方之间的意见分歧</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q16" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q16" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q16" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q16" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q16" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="avoidance">
+          <p class="text-lg font-medium mb-4">17. 我会避免与对方的正面冲突</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q17" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q17" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q17" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q17" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q17" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="domination">
+          <p class="text-lg font-medium mb-4">18. 我利用我的专长权做出对自己有利的决策</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q18" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q18" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q18" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q18" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q18" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="accommodation">
+          <p class="text-lg font-medium mb-4">19. 我常常附和对方的建议</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q19" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q19" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q19" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q19" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q19" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="compromise">
+          <p class="text-lg font-medium mb-4">20. 我采用互谅互让的办法以达成双方妥协</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q20" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q20" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q20" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q20" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q20" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <!-- 第21-30题 -->
+        <div class="question-card" data-dimension="domination">
+          <p class="text-lg font-medium mb-4">21. 我一般坚持自己的观点</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q21" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q21" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q21" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q21" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q21" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="cooperation">
+          <p class="text-lg font-medium mb-4">22. 我尽量向对方开诚布公地提出我们关心的问题以便问题能够以最好的方式解决</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q22" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q22" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q22" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q22" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q22" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="cooperation">
+          <p class="text-lg font-medium mb-4">23. 我与对方协作以达成双方均可接受的结果</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q23" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q23" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q23" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q23" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q23" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="accommodation">
+          <p class="text-lg font-medium mb-4">24. 我尽力满足对方的期望</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q24" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q24" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q24" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q24" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q24" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="domination">
+          <p class="text-lg font-medium mb-4">25. 我有时利用自己的权力赢得有利的情形</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q25" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q25" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q25" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q25" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q25" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="avoidance">
+          <p class="text-lg font-medium mb-4">26. 我试图压制与对方的分歧以避免产生不快</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q26" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q26" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q26" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q26" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q26" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="avoidance">
+          <p class="text-lg font-medium mb-4">27. 我尽力避免与对方的不愉快的交流</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q27" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q27" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q27" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q27" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q27" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="cooperation">
+          <p class="text-lg font-medium mb-4">28. 我尽力与对方共同努力以获得对问题的恰当的理解</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q28" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">1</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q28" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q28" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q28" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q28" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">5</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="cognition">
+          <p class="text-lg font-medium mb-4">29. 当我跟恋人发生恋爱冲突时，我不能够十分理解他(她)</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q29" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">5</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q29" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q29" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q29" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q29" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">1</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="question-card" data-dimension="cognition">
+          <p class="text-lg font-medium mb-4">30. 发生恋爱冲突后，我感觉我的恋人并不像我期望的那样关注我</p>
+         <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q30" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">5</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q30" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q30" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q30" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q30" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">1</span>
+            </label>
+          </div>
+        </div>
+
+        
+        <!-- 第31-41题 -->
+        <div class="question-card" data-dimension="cognition">
+          <p class="text-lg font-medium mb-4">31. 当发生恋爱冲突时，我觉得我的恋人忽视我</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q31" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">5</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q31" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q31" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q31"  value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q31" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">1</span>
+            </label>
+          </div>
+        </div>
+
+        
+        <div class="question-card" data-dimension="emotion">
+          <p class="text-lg font-medium mb-4">32. 和恋人发生冲突后，我内心十分不平静</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q32"  value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">5</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q32"value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q32"value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q32" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q32" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">1</span>
+            </label>
+          </div>
+        </div>
+
+        
+        <div class="question-card" data-dimension="emotion">
+          <p class="text-lg font-medium mb-4">33. 当和恋人发生冲突后，我没办法让自己变得好受</p>
+         <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q33"value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">5</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q33" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q33"value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q33"value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q33"value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">1</span>
+            </label>
+          </div>
+        </div>
+ 
+        <div class="question-card" data-dimension="cognition">
+          <p class="text-lg font-medium mb-4">34. 当发生恋爱冲突时，我觉得他(她)不爱我了</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q34"value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">5</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q34"value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q34" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q34"value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q34"value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">1</span>
+            </label>
+          </div>
+        </div>
+
+        
+        <div class="question-card" data-dimension="cognition">
+          <p class="text-lg font-medium mb-4">35. 我觉得发生恋爱冲突都是对方的错</p>
+         <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q35"value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">5</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q35" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q35"value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q35" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q35"value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">1</span>
+            </label>
+          </div>
+        </div>
+
+        
+        <div class="question-card" data-dimension="domination">
+          <p class="text-lg font-medium mb-4">36. 恋爱冲突发生后我要求对方先来给我道歉</p>
+         <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q36" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">5</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q36" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q36" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q36" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q36"value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">1</span>
+            </label>
+          </div>
+        </div>
+
+        
+        <div class="question-card" data-dimension="cognition">
+          <p class="text-lg font-medium mb-4">37. 当发生恋爱冲突时，我对他(她)十分失望</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q37"value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">5</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q37"value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q37"value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q37" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q37"value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">1</span>
+            </label>
+          </div>
+        </div>
+
+        
+        <div class="question-card" data-dimension="cognition">
+          <p class="text-lg font-medium mb-4">38. 当发生恋爱冲突时，我担心我们的爱情不会持续下去了</p>
+       <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q38" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">5</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q38" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q38" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q38" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q38" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">1</span>
+            </label>
+          </div>
+        </div>
+
+        
+        <div class="question-card" data-dimension="emotion">
+          <p class="text-lg font-medium mb-4">39. 当和恋人发生冲突后，我会因为不知如何解决而十分痛苦</p>
+       <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q39" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">5</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q39" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q39" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q39" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q39" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">1</span>
+            </label>
+          </div>
+        </div>
+
+        
+        <div class="question-card" data-dimension="emotion">
+          <p class="text-lg font-medium mb-4">40. 当和恋人发生冲突后，我没办法让自己变得好受，特别担心</p>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q40" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">5</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q40" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q40" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q40" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q40" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">1</span>
+            </label>
+          </div>
+        </div>
+
+        
+
+             <div class="question-card" data-dimension="emotion">
+          <p class="text-lg font-medium mb-4">41. 恋爱冲突发生后，我对自己的言行十分懊恼与后悔</p>
+         <div class="grid grid-cols-5 gap-2">
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q41" value="5" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常不符合</span>
+              <span class="text-xs">5</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q41" value="4" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较不符合</span>
+              <span class="text-xs">4</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q41" value="3" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">一般符合</span>
+              <span class="text-xs">3</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q41" value="2" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">比较符合</span>
+              <span class="text-xs">2</span>
+            </label>
+            <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors duration-300 hover:border-primary">
+              <input type="radio" name="q41" value="1" class="mb-1 h-5 w-5 text-primary focus:ring-primary">
+              <span class="text-sm">非常符合</span>
+              <span class="text-xs">1</span>
+            </label>
+          </div>
+        </div>
+
+
+        
+        <!-- 更多问题（为简化示例，这里只显示两个问题，实际应包含所有41个问题） -->
+        
+        <div class="flex justify-between mt-8">
+          <button id="prev-conflict" class="btn-secondary">
+            <i class="fa fa-arrow-left mr-2"></i> 上一步
+          </button>
+          <button id="submit-questionnaire" class="btn-primary">
+            <i class="fa fa-check mr-2"></i> 提交问卷
+          </button>
+        </div>
+      </section>
+    </section>
+
+    <!-- 结果展示区 -->
+    <section id="results-section" class="hidden max-w-4xl mx-auto my-12">
+      <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+        <div class="text-center mb-8">
+          <div class="w-16 h-16 mx-auto rounded-full bg-green-100 flex items-center justify-center mb-4">
+            <i class="fa fa-bar-chart text-green-600 text-2xl"></i>
+          </div>
+          <h2 class="text-3xl font-bold text-neutral mb-2">恋爱冲突应对表现分析</h2>
+          <p class="text-gray-600">基于您的回答，以下是您在恋爱冲突中的表现分析</p>
+        </div>
+        
+        <!-- 结果摘要 -->
+        <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 mb-8 border border-blue-100">
+          <h3 class="text-xl font-bold text-primary mb-4">分析摘要</h3>
+          <p class="text-neutral">
+            您在恋爱冲突中的应对风格分析如下。每个维度的平均分代表您在该领域的倾向程度（1-5分），分数越高表示该倾向越强。
+          </p>
+          <div class="mt-4 flex flex-wrap">
+            <span class="dimension-badge bg-blue-100 text-blue-800">合作倾向: <span id="cooperation-summary">0.0</span></span>
+            <span class="dimension-badge bg-pink-100 text-pink-800">顺从倾向: <span id="accommodation-summary">0.0</span></span>
+            <span class="dimension-badge bg-yellow-100 text-yellow-800">回避倾向: <span id="avoidance-summary">0.0</span></span>
+            <span class="dimension-badge bg-red-100 text-red-800">支配倾向: <span id="domination-summary">0.0</span></span>
+            <span class="dimension-badge bg-green-100 text-green-800">认知倾向: <span id="cognition-summary">0.0</span></span>
+            <span class="dimension-badge bg-purple-100 text-purple-800">情绪倾向: <span id="emotion-summary">0.0</span></span>
+          </div>
+        </div>
+        
+        <!-- 各维度结果图表 -->
+        <div class="mb-10">
+          <h3 class="text-xl font-bold text-primary mb-4">维度得分对比</h3>
+          
+          <div class="mb-6">
+            <div class="dimension-label">
+              <span>合作倾向</span>
+              <span id="cooperation-score">0.0</span>
+            </div>
+            <div class="dimension-chart">
+              <div id="cooperation-chart" class="dimension-fill" style="width: 0%"></div>
+            </div>
+          </div>
+          
+          <div class="mb-6">
+            <div class="dimension-label">
+              <span>顺从倾向</span>
+              <span id="accommodation-score">0.0</span>
+            </div>
+            <div class="dimension-chart">
+              <div id="accommodation-chart" class="dimension-fill" style="width: 0%"></div>
+            </div>
+          </div>
+          
+          <div class="mb-6">
+            <div class="dimension-label">
+              <span>回避倾向</span>
+              <span id="avoidance-score">0.0</span>
+            </div>
+            <div class="dimension-chart">
+              <div id="avoidance-chart" class="dimension-fill" style="width: 0%"></div>
+            </div>
+          </div>
+          
+          <div class="mb-6">
+            <div class="dimension-label">
+              <span>支配倾向</span>
+              <span id="domination-score">0.0</span>
+            </div>
+            <div class="dimension-chart">
+              <div id="domination-chart" class="dimension-fill" style="width: 0%"></div>
+            </div>
+          </div>
+          
+          <div class="mb-6">
+            <div class="dimension-label">
+              <span>认知倾向</span>
+              <span id="cognition-score">0.0</span>
+            </div>
+            <div class="dimension-chart">
+              <div id="cognition-chart" class="dimension-fill" style="width: 0%"></div>
+            </div>
+          </div>
+          
+          <div class="mb-6">
+            <div class="dimension-label">
+              <span>情绪倾向</span>
+              <span id="emotion-score">0.0</span>
+            </div>
+            <div class="dimension-chart">
+              <div id="emotion-chart" class="dimension-fill" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 各维度结果 -->
+        <h3 class="text-xl font-bold text-primary mb-4">详细分析</h3>
+        <div class="space-y-6">
+          <!-- 合作倾向 -->
+          <div class="result-card">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-bold text-primary">合作倾向</h3>
+              <div class="text-right">
+                <span class="text-2xl font-bold text-primary" id="cooperation-avg">0.0</span>
+                <div id="cooperation-percentile" class="percentile-badge p50">p50</div>
+              </div>
+            </div>
+            <p class="text-gray-600 mb-4" id="cooperation-explanation">你将冲突视为深化理解的契机，主动营造安全沟通环境，擅长整合双方需求寻找创造性解决方案。</p>
+            <p class="text-sm text-gray-500 italic" id="cooperation-interpretation">平均分越高，越倾向于通过协作解决冲突，关系修复能力越强。</p>
+          </div>
+          
+          <!-- 顺从倾向 -->
+          <div class="result-card">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-bold text-primary">顺从倾向</h3>
+              <div class="text-right">
+                <span class="text-2xl font-bold text-primary" id="accommodation-avg">0.0</span>
+                <div id="accommodation-percentile" class="percentile-badge p50">p50</div>
+              </div>
+            </div>
+            <p class="text-gray-600 mb-4" id="accommodation-explanation">你常以迁就对方结束冲突，将关系和谐置于个人需求之上。</p>
+            <p class="text-sm text-gray-500 italic" id="accommodation-interpretation">平均分越高，越习惯牺牲自身需求妥协，需注意建立关系边界。</p>
+          </div>
+          
+          <!-- 回避倾向 -->
+          <div class="result-card">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-bold text-primary">回避倾向</h3>
+              <div class="text-right">
+                <span class="text-2xl font-bold text-primary" id="avoidance-avg">0.0</span>
+                <div id="avoidance-percentile" class="percentile-badge p50">p50</div>
+              </div>
+            </div>
+            <p class="text-gray-600 mb-4" id="avoidance-explanation">你倾向于逃避冲突而非直面问题，用沉默或转移话题缓解紧张。</p>
+            <p class="text-sm text-gray-500 italic" id="avoidance-interpretation">平均分越高，越倾向于回避矛盾，建议学习主动沟通技巧。</p>
+          </div>
+          
+          <!-- 支配倾向 -->
+          <div class="result-card">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-bold text-primary">支配倾向</h3>
+              <div class="text-right">
+                <span class="text-2xl font-bold text-primary" id="domination-avg">0.0</span>
+                <div id="domination-percentile" class="percentile-badge p50">p50</div>
+              </div>
+            </div>
+            <p class="text-gray-600 mb-4" id="domination-explanation">你习惯掌控冲突方向，强调自身观点或需求优先。</p>
+            <p class="text-sm text-gray-500 italic" id="domination-interpretation">平均分越高，越倾向于主导冲突解决，需增加倾听伴侣的时间。</p>
+          </div>
+          
+          <!-- 认知倾向 -->
+          <div class="result-card">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-bold text-primary">认知倾向</h3>
+              <div class="text-right">
+                <span class="text-2xl font-bold text-primary" id="cognition-avg">0.0</span>
+                <div id="cognition-percentile" class="percentile-badge p50">p50</div>
+              </div>
+            </div>
+            <p class="text-gray-600 mb-4" id="cognition-explanation">冲突中你容易负面解读对方行为（如认为"TA不爱我了"）。</p>
+            <p class="text-sm text-gray-500 italic" id="cognition-interpretation">平均分越高，越容易对冲突产生消极认知，建议区分'事实'与'想象'。</p>
+          </div>
+          
+          <!-- 情绪倾向 -->
+          <div class="result-card">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-bold text-primary">情绪倾向</h3>
+              <div class="text-right">
+                <span class="text-2xl font-bold text-primary" id="emotion-avg">0.0</span>
+                <div id="emotion-percentile" class="percentile-badge p50">p50</div>
+              </div>
+            </div>
+            <p class="text-gray-600 mb-4" id="emotion-explanation">冲突后你容易陷入强烈负面情绪且难以平复。</p>
+            <p class="text-sm text-gray-500 italic" id="emotion-interpretation">平均分越高，情绪调节能力越弱，建议用情绪日记记录触发点。</p>
+          </div>
+        </div>
+        
+        <!-- 建议部分 -->
+        <div class="bg-blue-50 rounded-xl p-6 mt-10 border border-blue-100">
+          <h3 class="text-xl font-bold text-primary mb-4">专家建议</h3>
+          <p class="text-gray-600 mb-4">根据您的测试结果，我们为您提供以下建议：</p>
+          <ul class="list-disc pl-5 space-y-2 text-gray-600">
+            <li>尝试在冲突中保持开放心态，倾听对方的观点和感受</li>
+            <li>当情绪激动时，给自己和对方一些冷静的时间</li>
+            <li>练习使用"我"语句表达感受，避免指责对方</li>
+            <li>定期与伴侣讨论关系中的需求和期望</li>
+            <li>考虑在必要时寻求专业情感咨询师的帮助</li>
+          </ul>
+        </div>
+        
+        <!-- 重新测试按钮 -->
+        <div class="flex justify-center mt-10">
+          <button id="restart-btn" class="btn-secondary">
+            <i class="fa fa-refresh mr-2"></i> 重新测试
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <script>
+    // 维度配置（题目映射与计分规则）
+    const dimensionConfig = {
+      cooperation: {
+        questions: [1, 4, 5, 7, 12, 14, 15, 20, 22, 23, 28],
+        reverse: false,
+        explanation: "你将冲突视为深化理解和强化关系的契机，而非单纯的对立。你主动营造安全、开放的沟通环境，鼓励双方坦诚表达感受和核心需求。你具备优秀的倾听和共情能力，能理解对方观点背后的深层原因。",
+        interpretation: "平均分越高，越倾向于通过协作解决冲突，关系修复能力越强。"
+      },
+      accommodation: {
+        questions: [2, 10, 11, 13, 19, 24],
+        reverse: false,
+        explanation: "你将维持关系表面的和谐与避免直接对抗置于个人需求和感受之上。在冲突中，你倾向于快速让步、妥协或放弃自己的立场，以求'息事宁人'。你可能会压抑自己的真实想法、感受或不满。",
+        interpretation: "平均分越高，越习惯牺牲自身需求妥协，需注意建立关系边界。"
+      },
+      avoidance: {
+        questions: [3, 6, 16, 17, 26, 27],
+        reverse: false,
+        explanation: "你对冲突感到强烈的不适或焦虑，倾向于采取物理或情感上的撤退策略来逃避直面问题。你可能会在冲突发生时突然变得'很忙'、沉默不语、转移话题、离开现场，或者虽然在场但心不在焉。",
+        interpretation: "平均分越高，越倾向于回避矛盾，建议学习主动沟通技巧。"
+      },
+      domination: {
+        questions: [8, 9, 18, 21, 25, 36],
+        reverse: false,
+        explanation: "在冲突中，你将赢得争论、证明自己正确或确保自己的需求/解决方案被采纳作为首要目标。你倾向于强调自己的观点、立场和需求，运用说服、争论、施加压力等方式让对方让步或服从。",
+        interpretation: "平均分越高，越倾向于主导冲突解决，需增加倾听伴侣的时间。"
+      },
+      cognition: {
+        questions: [29, 30, 31, 34, 35, 37, 38],
+        reverse: true,
+        explanation: "在冲突发生后，你的思维容易滑向消极、扭曲的解读模式。这包括灾难化、过度归因/个人化、读心术、非黑即白/极端化、选择性注意等认知偏差。",
+        interpretation: "平均分越高，越容易对冲突产生消极认知，建议区分'事实'与'想象'。"
+      },
+      emotion: {
+        questions: [32, 33, 39, 40, 41],
+        reverse: true,
+        explanation: "冲突后，你容易体验到强烈、持久且难以自我平复的负面情绪。这些情绪可能在生理层面引发明显反应。你可能会反复回想冲突的细节、自己或对方说过的话、做过的行为，不断咀嚼痛苦。",
+        interpretation: "平均分越高，情绪调节能力越弱，建议用情绪日记记录触发点。"
+      }
+    };
+
+    // 常模数据（简化版，实际应包含所有维度）
+    const normData = {
+      // 全样本
+      'all': {
+        cooperation: [3, 3.1818, 3.4818, 3.7273, 3.9091, 4, 4.0909, 4.4364, 4.9909],
+        accommodation: [2.5, 3, 3, 3.1667, 3.5, 3.6667, 3.8333, 4, 4.4833],
+        avoidance: [2.1667, 2.8333, 3, 3.1667, 3.3333, 3.6667, 3.8333, 4.1667, 4.5],
+        domination: [2, 2.4, 2.6, 2.8, 3, 3, 3.2, 3.8, 4],
+        cognition: [2.0125, 2.275, 2.5, 2.8, 3, 3, 3.3375, 3.5, 4.125],
+        emotion: [1.82, 2.24, 2.6, 2.8, 3, 3, 3.2, 3.8, 4.18]
+      },
+      // 女性（性别=2）
+      '2': {
+        cooperation: [3.1818, 3.4545, 3.5455, 3.7273, 3.8636, 4, 4.0273, 4.1818, 4.6727],
+        accommodation: [2.65, 2.8333, 3, 3.1, 3.25, 3.5, 3.5, 3.7, 4],
+        avoidance: [1.9833, 2.6333, 2.9, 3.1667, 3.3333, 3.5, 3.6667, 3.8667, 4.1667],
+        domination: [2.18, 2.56, 2.6, 2.8, 3, 3.2, 3.26, 3.8, 4],
+        cognition: [2.125, 2.35, 2.625, 2.95, 3.1875, 3.375, 3.5, 3.9, 4.125],
+        emotion: [2, 2.36, 2.6, 2.8, 3, 3.08, 3.26, 3.8, 4.22]
+      },
+      // 男性（性别=1）
+      '1': {
+        cooperation: [2.4818, 3, 3.3455, 3.6364, 3.9091, 4, 4.1, 4.7273, 5],
+        accommodation: [2.1667, 3, 3, 3.5, 3.6667, 3.8333, 4, 4.1667, 4.7333],
+        avoidance: [2.1667, 3, 3, 3.1667, 3.5, 3.6667, 4, 4.2333, 4.9],
+        domination: [2, 2.4, 2.6, 2.8, 3, 3, 3.2, 3.8, 4.94],
+        cognition: [1.825, 2.25, 2.5, 2.75, 2.9375, 3, 3.025, 3.425, 4.2125],
+        emotion: [1.8, 2.2, 2.58, 2.8, 3, 3, 3.2, 3.68, 4.7]
+      }
+    };
+
+    // 计算百分等级
+    function calculatePercentile(score, norms) {
+      const percentiles = [10, 20, 30, 40, 50, 60, 70, 80, 90];
+      for (let i = norms.length - 1; i >= 0; i--) {
+        if (score >= norms[i]) {
+          return percentiles[i];
+        }
+      }
+      return 10;
+    }
+
+    // 计算各维度平均分
+    const calculateAverageScores = () => {
+      const scores = {};
+      
+      // 遍历各维度计算平均分
+      for (const [dimension, config] of Object.entries(dimensionConfig)) {
+        let validCount = 0;
+        let scoreSum = 0;
+        
+        // 计算原始得分或反向计分
+        config.questions.forEach(qNum => {
+          const answer = document.querySelector(`input[name="q${qNum}"]:checked`);
+          if (answer) {
+            const rawScore = parseInt(answer.value);
+            // 反向计分：6 - 原始得分
+            const score = config.reverse ? (6 - rawScore) : rawScore;
+            scoreSum += score;
+            validCount++;
+          }
+        });
+        
+        // 计算平均分（保留1位小数）
+        scores[dimension] = validCount > 0 
+          ? (scoreSum / validCount).toFixed(1) 
+          : "0.0";
+      }
+      
+      return scores;
+    };
+    
+    // 更新结果显示
+    const updateResults = () => {
+      const scores = calculateAverageScores();
+      
+      // 获取用户性别
+      const gender = document.querySelector('input[name="gender"]:checked')?.value || 'all';
+      
+      // 更新各维度平均分
+      for (const dimension in scores) {
+        const score = parseFloat(scores[dimension]);
+        
+        // 更新平均分显示
+        document.getElementById(`${dimension}-avg`).textContent = score;
+        document.getElementById(`${dimension}-summary`).textContent = score;
+        document.getElementById(`${dimension}-score`).textContent = score;
+        
+        // 更新图表
+        const chartWidth = (score / 5) * 100;
+        document.getElementById(`${dimension}-chart`).style.width = `${chartWidth}%`;
+        
+        // 计算并显示百分等级
+        const normArray = normData[gender]?.[dimension] || normData['all'][dimension];
+        const percentile = calculatePercentile(score, normArray);
+        const percentileElement = document.getElementById(`${dimension}-percentile`);
+        percentileElement.textContent = `p${percentile}`;
+        
+        // 更新百分等级颜色
+        const percentileClasses = ['p10','p20','p30','p40','p50','p60','p70','p80','p90'];
+        percentileElement.classList.remove(...percentileClasses);
+        percentileElement.classList.add(`p${percentile}`);
+        
+        // 更新维度解释
+        document.getElementById(`${dimension}-explanation`).textContent = 
+          dimensionConfig[dimension].explanation;
+      }
+      
+      // 显示结果区，隐藏问卷区
+      document.getElementById('questionnaire-section').classList.add('hidden');
+      document.getElementById('results-section').classList.remove('hidden');
+      
+      // 平滑滚动到顶部
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    
+    // 重置问卷
+    const resetQuestionnaire = () => {
+      document.querySelectorAll('input:checked').forEach(checkbox => {
+        checkbox.checked = false;
+      });
+      document.getElementById('results-section').classList.add('hidden');
+      document.getElementById('welcome-section').classList.remove('hidden');
+      
+      // 重置进度条
+      document.getElementById('progress-fill').style.width = '0%';
+    };
+    
+    // 绑定事件监听器
+    document.addEventListener('DOMContentLoaded', () => {
+      // 欢迎页面到问卷页面的导航
+      const startBtn = document.getElementById('start-btn');
+      const welcomeSection = document.getElementById('welcome-section');
+      const questionnaireSection = document.getElementById('questionnaire-section');
+      
+      if (startBtn && welcomeSection && questionnaireSection) {
+        startBtn.addEventListener('click', () => {
+          welcomeSection.classList.add('hidden');
+          questionnaireSection.classList.remove('hidden');
+          document.getElementById('progress-fill').style.width = '20%';
+        });
+      }
+      
+      // 个人信息部分的"下一步"按钮事件
+      const nextPersonalBtn = document.getElementById('next-personal');
+      const personalSection = document.getElementById('personal-info');
+      const conflictSection = document.getElementById('conflict-coping');
+      
+      if (nextPersonalBtn && personalSection && conflictSection) {
+        nextPersonalBtn.addEventListener('click', () => {
+          // 验证必填项（示例：至少选择性别）
+          const genderSelected = document.querySelector('input[name="gender"]:checked');
+          if (!genderSelected) {
+            alert('请先选择您的性别');
+            return;
+          }
+          
+          // 隐藏个人信息部分，显示冲突应对部分
+          personalSection.classList.add('hidden');
+          conflictSection.classList.remove('hidden');
+          
+          // 更新进度条到50%
+          document.getElementById('progress-fill').style.width = '50%';
+        });
+      }
+      
+      // 冲突应对部分的"上一步"按钮事件
+      const prevConflictBtn = document.getElementById('prev-conflict');
+      if (prevConflictBtn) {
+        prevConflictBtn.addEventListener('click', () => {
+          conflictSection.classList.add('hidden');
+          personalSection.classList.remove('hidden');
+          document.getElementById('progress-fill').style.width = '20%';
+        });
+      }
+      
+      // 提交问卷按钮
+      document.getElementById('submit-questionnaire').addEventListener('click', updateResults);
+      
+      // 重新测试按钮
+      document.getElementById('restart-btn').addEventListener('click', resetQuestionnaire);
+    });
+  </script>
+</body>
+</html>
